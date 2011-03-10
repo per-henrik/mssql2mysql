@@ -1,0 +1,74 @@
+Converter from Microsoft SQL Server to MySQL
+mssql2mysql is a free VB/VBA script (license: GPL 2) to convert databases from Microsoft SQL Server to MySQL (initial copyright by Michael Kofler 2001). mssql2mysql has been tested using Microsoft SQL Server 2000, MySQL 5.0.2, Connector/ODBC 3.51 and Visual Basic 6 / VBA 6. mssql2mysql successfully converted pubs, northwind and a number of databases of the author.
+
+Download
+
+mssql2mysql.txt
+
+Features
+
+Converts both schema (tables and indices) and data (numbers, strings, dates etc.).
+Copes with table and column names which are not legal in MySQL. (Spaces etc. are replaced by _.)
+Either writes all SQL commands into a text file or executes these commands directly at a connected MySQL server (i.e. no need for huge temporary files).
+Limitations
+
+No support for foreign keys, SPs, triggers, views and user defined data types.
+MySQL does not support tables with more than one AUTO_INCREMENT column; the converter does not check this, so change the table definition in Microsoft SQL Server before starting the conversion.
+The AUTO_INCREMENT column must be a key column; the converter does not check this, so use Microsoft SQL Server to add an index to the AUTO_INCREMENT column before starting the conversion.
+No conversion of privileges/access infos (the idea of logins/users in Microsoft SQL Server is incompatible with the user/group/database/table/column privileges system of MySQL).
+Microsoft SQL Server TIMESTAMPS are incompatible with the TIMESTAMPS of MySQL. Therefore, they are converted to TINYBLOBs.
+The script version offers no visible feedback during conversion process.
+Requirements
+
+mssql2mysql is a Visual Basic script; you need either Visual Basic 6 or a program with VBA 6 environment (Word 2000 or newer, Excel 2000 or newer, Access 2000 or newer etc.) to run this script.
+The script uses the ADO library (tested with versions 2.5, 2.7 and 2.8, but should work with other versions also), the SQLDMO library (tested with the version which comes with SQL Server 7 and 2000) and the Microsoft Scripting library. All of this should be on your computer if you have both SQL Server and VBA6/VB6 installed.
+Connector/ODBC (tested with 3.51.) Connector/ODBC is only needed if you want to connect directly to MySQL. You can also write a text file with SQL statements. In this case, Connector/ODBC is not needed.
+Configuration
+
+mssql2mysql starts with a block of constants. Set the values of these constants to configure the script.
+
+' MSSQL login
+Const MSSQL_SECURE_LOGIN = True   'login type (True for NT security)
+Const MSSQL_LOGIN_NAME = ""       'login name (for NT security use "" here)
+Const MSSQL_PASSWORD = ""         'password   (for NT security use "" here)
+Const MSSQL_HOST = "mars"         'hostname   (if localhost: use "(local)")
+Const MSSQL_DB_NAME = "pubs"      'database name
+
+' mode
+Const OUTPUT_TO_FILE = 0          '1 --> write file;
+                                  '0 --> connect to MySQL, execute SQL 
+                                  '      commands directly
+
+'output file (only needed if OUTPUT_TO_FILE=1)
+Const OUTPUT_FILENAME = "c:\export.sql"
+
+'connect to MySQL (only needed if OUTPUT_TO_FILE=0)
+Const MYSQL_USER_NAME = "root"    'login name
+Const MYSQL_PASSWORD = "xxx"      'password
+Const MYSQL_HOST = "hostname"     'if localhost: use "localhost"
+Const MYSQL_PORT = 3306           'change if you use another port
+Const MyODBCVersion = "MySQL ODBC 3.51 Driver"
+
+' options
+Const NEW_DB_NAME = ""            'name of new MySQL database ("" if same 
+                                  ' as MSSQL db name)
+Const DROP_DATABASE = True        'begin with DROP dbname?
+Const MAX_RECORDS = 0             'max. nr of records per table 
+                                  '(0 for all records, n for testing purposes)
+Const VARCHAR_MAX = 255           'max. no. of characters in VARCHAR
+                                  '255 for MySQL <= 5.0.2
+                                  'ca. 32000 for MySQL >= 5.0.3
+Const TABLE_ENGINE = "InnoDB"     'MyISAM or InnoDB
+Const CHARSET = "utf8"            'character set for all text columns
+Const COLLATION = ""              'collation; leave empty if you want to use the 
+                                  'default collection for the specified charset
+Some more details:
+
+MSSQL_SECURE_LOGIN (True/False) specifies whether mssql2mysql should use the NT/2000 security system to login at MSSQL. If this is True, neither username nor password need to be specified.
+DROP_DATABASE (True/False) specifies whether mssql2mysql should start by dropping the MySQL database of a previous conversion attempt (if one already exists).
+MAX_RECORDS (n) specifies how many records per table should be converted. 0 means all records. This option allows to do a quick check (i.e. MAX_RECORDS=10) before trying to convert the whole database (which may take some time and may give an error at the very last table).
+TABLE_ENGINE: Specifies the table type (MyISAM or InnoDB).
+CHARSET and COLLATION: Specify which characterset and collation should be used for all text columns. If COLLATION is empty, the default collation for the choosen charset is used.
+Support
+
+mssql2mysql is not supported! The latest version is from 2005. You really should  consider using the MySQL Migration Toolkit instead!
